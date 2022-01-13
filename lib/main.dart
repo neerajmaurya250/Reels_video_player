@@ -5,7 +5,6 @@ import 'package:reels_video_player_example/content_screen.dart';
 import 'package:tiktoklikescroller/tiktoklikescroller.dart';
 import 'package:video_player/video_player.dart';
 
-
 void main() {
   runApp(MyApp());
 }
@@ -42,16 +41,12 @@ class _ReelsState extends State<Reels> {
   ];
 
   bool selectedLike = true;
-  bool centreLike=false;
+  bool centreLike = false;
   Map<String, VideoPlayerController> _controllers = {};
   Map<int, VoidCallback> _listeners = {};
   bool _lock = true;
   int indexx = 0;
-  var current = 0;
-
-
-
-
+  //var current = 0;
 
   void _playController(int index) async {
     // if (!_listeners.keys.contains(index)) {
@@ -61,12 +56,12 @@ class _ReelsState extends State<Reels> {
     await _controller(index)!.play();
     // setState(() {});
   }
+
   void _removeController(int index) {
     _controller(index)!.dispose();
     _controllers.remove(videos.elementAt(index));
     _listeners.remove(index);
   }
-
 
   void _previousVideo() {
     print('PREVIOUS');
@@ -168,7 +163,6 @@ class _ReelsState extends State<Reels> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: SafeArea(
         child: Container(
@@ -179,16 +173,47 @@ class _ReelsState extends State<Reels> {
               Swiper(
                 scrollDirection: Axis.vertical,
                 itemCount: videos.length,
-                onIndexChanged: (i){
+                onIndexChanged: (i) {
+                  if (i > 0 ) {
+                    if (i < indexx) {
+                      print("previous");
+                      _previousVideo();
+                    } else {
+                      print("next");
+                      _nextVideo();
+                    }
+                  } else if (i == 0) {
+                    if (videos.length > 0) {
+                      _initController(0).then((_) {
+                        _playController(0);
+                      });
+                    }
 
-                  if(i == current){
-                    current = i;
-                    _previousVideo();
-                  }else{
-                    _nextVideo();
+                    if (videos.length > 1) {
+                      _initController(1).whenComplete(() => _lock = false);
+                    }
+                  }else if(i==videos.length-1){
+                    print("previous");
+                      _previousVideo();
                   }
 
-                  current = i;
+                  /* if (indexx > 0) {
+                    if (i < indexx) {
+                      print("previous");
+                      _previousVideo();
+                    } else {
+                      print("next");
+                     
+                    }
+                  } */
+                  /*  if(i == current){
+                    current = i;
+                    
+                  }else{
+                    
+                  } */
+
+                  //  current = i;
                 },
                 // itemHeight:  MediaQuery.of(context).size.height,
                 itemBuilder: (BuildContext context, int index) {
@@ -200,20 +225,19 @@ class _ReelsState extends State<Reels> {
                           /*chewieController != null &&
                               chewieController!
                                   .videoPlayerController.value.isInitialized
-                              ?*/ GestureDetector(
+                              ?*/
+                          GestureDetector(
                               onDoubleTap: () {
                                 setState(() {
                                   centreLike = !centreLike;
                                 });
                               },
-
                               child: Container(
                                 height: MediaQuery.of(context).size.height,
-                                  color: Colors.red,
-                                  // child: Chewie(controller: chewieController!)
-                                child: VideoPlayer(_controller(index)! ),
-                              )
-                          ),
+                                color: Colors.red,
+                                // child: Chewie(controller: chewieController!)
+                                child: VideoPlayer(_controller(index)!),
+                              )),
                           //     : Column(
                           //   mainAxisAlignment: MainAxisAlignment.center,
                           //   children: [
@@ -229,7 +253,8 @@ class _ReelsState extends State<Reels> {
                               margin: EdgeInsets.symmetric(horizontal: 16),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Row(
                                     children: [
@@ -237,7 +262,8 @@ class _ReelsState extends State<Reels> {
                                         height: 48,
                                         width: 48,
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(24.0),
+                                          borderRadius:
+                                              BorderRadius.circular(24.0),
                                           color: Colors.blue,
                                         ),
                                       ),
@@ -265,15 +291,18 @@ class _ReelsState extends State<Reels> {
                                               color: Colors.white,
                                             ),
                                           ),
-
                                         ],
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                       ),
                                     ],
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.only(right: 30.0),
-                                    child: Icon(Icons.more_vert_rounded, color: Colors.white,),
+                                    child: Icon(
+                                      Icons.more_vert_rounded,
+                                      color: Colors.white,
+                                    ),
                                   )
                                 ],
                               ),
@@ -328,8 +357,11 @@ class _ReelsState extends State<Reels> {
               ),
               Padding(
                 padding:
-                const EdgeInsets.symmetric(vertical: 20.0, horizontal: 12),
-                child: Icon(Icons.arrow_back_rounded, color: Colors.white,),
+                    const EdgeInsets.symmetric(vertical: 20.0, horizontal: 12),
+                child: Icon(
+                  Icons.arrow_back_rounded,
+                  color: Colors.white,
+                ),
               )
             ],
           ),
