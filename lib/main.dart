@@ -18,8 +18,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: VideoPlayerDemo(),
-      // home: Reels(),
+      // home: VideoPlayerDemo(),
+      home: Reels(),
     );
   }
 }
@@ -46,19 +46,18 @@ class _ReelsState extends State<Reels> {
   Map<String, VideoPlayerController> _controllers = {};
   Map<int, VoidCallback> _listeners = {};
   bool _lock = true;
-  int index = 0;
+  int indexx = 0;
+  var current = 0;
 
 
 
-  VideoPlayerController? _controller(int index) {
-    return _controllers[videos.elementAt(index)];
-  }
+
 
   void _playController(int index) async {
     // if (!_listeners.keys.contains(index)) {
     //   _listeners[index] = _listenerSpawner(index);
     // }
-    _controller(index)!.addListener(_listeners[index]!);
+    // _controller(0)?.addListener(_listeners[0]);
     await _controller(index)!.play();
     // setState(() {});
   }
@@ -70,44 +69,46 @@ class _ReelsState extends State<Reels> {
 
 
   void _previousVideo() {
-    if (_lock || index == 0) {
+    print('PREVIOUS');
+    if (_lock || indexx == 0) {
       return;
     }
     _lock = true;
 
     // _stopController(index);
 
-    if (index + 1 < videos.length) {
-      _removeController(index + 1);
+    if (indexx + 1 < videos.length) {
+      _removeController(indexx + 1);
     }
 
-    _playController(--index);
+    _playController(--indexx);
 
-    if (index == 0) {
+    if (indexx == 0) {
       _lock = false;
     } else {
-      _initController(index - 1).whenComplete(() => _lock = false);
+      _initController(indexx - 1).whenComplete(() => _lock = false);
     }
   }
 
   void _nextVideo() async {
-    if (_lock || index == videos.length - 1) {
+    print('NEXT');
+    if (_lock || indexx == videos.length - 1) {
       return;
     }
-    _lock = true;
+    // _lock = true;
 
     // _stopController(index);
 
-    if (index - 1 >= 0) {
-      _removeController(index - 1);
+    if (indexx - 1 >= 0) {
+      _removeController(indexx - 1);
     }
 
-    _playController(++index);
+    _playController(++indexx);
 
-    if (index == videos.length - 1) {
-      _lock = false;
+    if (indexx == videos.length - 1) {
+      // _lock = false;
     } else {
-      _initController(index + 1).whenComplete(() => _lock = false);
+      _initController(indexx + 1);
     }
   }
 
@@ -118,6 +119,19 @@ class _ReelsState extends State<Reels> {
   void initState() {
     super.initState();
     // initializePlayer(0);
+    if (videos.length > 0) {
+      _initController(0).then((_) {
+        _playController(0);
+      });
+    }
+
+    if (videos.length > 1) {
+      _initController(1).whenComplete(() => _lock = false);
+    }
+  }
+
+  VideoPlayerController? _controller(int index) {
+    return _controllers[videos.elementAt(index)];
   }
 
   Future<void> _initController(int index) async {
@@ -126,24 +140,24 @@ class _ReelsState extends State<Reels> {
     await controller.initialize();
   }
 
-  Future initializePlayer(int index) async {
-    videoPlayerController = VideoPlayerController.network(videos.elementAt(index));
-    await Future.wait([videoPlayerController.initialize()]);
-
-    chewieController = ChewieController(
-      videoPlayerController: videoPlayerController,
-      autoPlay: true,
-      showControls: false,
-      looping: true,
-        allowFullScreen: true,
-        // aspectRatio: 0.512,
-        aspectRatio: 0.5,
-
-      // fullScreenByDefault: true,
-      allowMuting: true
-    );
-    setState(() {});
-  }
+  // Future initializePlayer(int index) async {
+  //   videoPlayerController = VideoPlayerController.network(videos.elementAt(index));
+  //   await Future.wait([videoPlayerController.initialize()]);
+  //
+  //   chewieController = ChewieController(
+  //     videoPlayerController: videoPlayerController,
+  //     autoPlay: true,
+  //     showControls: false,
+  //     looping: true,
+  //       allowFullScreen: true,
+  //       // aspectRatio: 0.512,
+  //       aspectRatio: 0.5,
+  //
+  //     // fullScreenByDefault: true,
+  //     allowMuting: true
+  //   );
+  //   setState(() {});
+  // }
 
   @override
   void dispose() {
@@ -166,8 +180,15 @@ class _ReelsState extends State<Reels> {
                 scrollDirection: Axis.vertical,
                 itemCount: videos.length,
                 onIndexChanged: (i){
-                  _initController(i);
-                  print('----->'+i.toString());
+
+                  if(i == current){
+                    current = i;
+                    _previousVideo();
+                  }else{
+                    _nextVideo();
+                  }
+
+                  current = i;
                 },
                 // itemHeight:  MediaQuery.of(context).size.height,
                 itemBuilder: (BuildContext context, int index) {
@@ -176,10 +197,10 @@ class _ReelsState extends State<Reels> {
                       child: Stack(
                         // fit: StackFit.expand,
                         children: [
-                          chewieController != null &&
+                          /*chewieController != null &&
                               chewieController!
                                   .videoPlayerController.value.isInitialized
-                              ? GestureDetector(
+                              ?*/ GestureDetector(
                               onDoubleTap: () {
                                 setState(() {
                                   centreLike = !centreLike;
@@ -189,17 +210,18 @@ class _ReelsState extends State<Reels> {
                               child: Container(
                                 height: MediaQuery.of(context).size.height,
                                   color: Colors.red,
-                                  child: Chewie(controller: chewieController!)
+                                  // child: Chewie(controller: chewieController!)
+                                child: VideoPlayer(_controller(index)! ),
                               )
-                          )
-                              : Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              CircularProgressIndicator(),
-                              SizedBox(height: 10),
-                              Text('Loading...')
-                            ],
                           ),
+                          //     : Column(
+                          //   mainAxisAlignment: MainAxisAlignment.center,
+                          //   children: [
+                          //     CircularProgressIndicator(),
+                          //     SizedBox(height: 10),
+                          //     Text('Loading...')
+                          //   ],
+                          // ),
                           Positioned(
                             bottom: 10,
                             child: Container(
@@ -524,6 +546,7 @@ class _HomeWidgetState extends State<HomeWidget> {
   }
 }*/
 
+/*
 class VideoPlayerDemo extends StatefulWidget {
   @override
   _VideoPlayerDemoState createState() => _VideoPlayerDemoState();
@@ -719,4 +742,4 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
       ),
     );
   }
-}
+}*/
