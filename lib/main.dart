@@ -61,6 +61,7 @@ class _ReelsState extends State<Reels> {
      }
      _controller(index)?.addListener(_listeners[index]!);
     await _controller(index)!.play();
+    _controller(index)!.setLooping(true);
     // setState(() {});
   }
   void _removeController(int index) {
@@ -260,7 +261,7 @@ VoidCallback _listenerSpawner(index) {
                                 height: MediaQuery.of(context).size.height,
                                   color: Colors.red,
                                   // child: Chewie(controller: chewieController!)
-                                child: VideoPlayer(_controller(index)! ),
+                                child: VideoPlayer(_controller(index)!,),
                               )
                           ),
                           //     : Column(
