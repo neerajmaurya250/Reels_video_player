@@ -73,7 +73,7 @@ class _ReelsState extends State<Reels> {
     if (_lock || indexx == 0) {
       return;
     }
-    _lock = true;
+    // _lock = true;
 
     // _stopController(index);
 
@@ -179,6 +179,8 @@ class _ReelsState extends State<Reels> {
               Swiper(
                 scrollDirection: Axis.vertical,
                 itemCount: videos.length,
+                loop: false,
+                index: indexx,
                 onIndexChanged: (i){
 
                   if(i == current){
@@ -190,7 +192,7 @@ class _ReelsState extends State<Reels> {
 
                   current = i;
                 },
-                // itemHeight:  MediaQuery.of(context).size.height,
+                itemHeight:  MediaQuery.of(context).size.height,
                 itemBuilder: (BuildContext context, int index) {
                   return Container(
                       height: MediaQuery.of(context).size.height,
