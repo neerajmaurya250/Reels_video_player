@@ -5,7 +5,6 @@ import 'package:reels_video_player_example/content_screen.dart';
 import 'package:tiktoklikescroller/tiktoklikescroller.dart';
 import 'package:video_player/video_player.dart';
 
-
 void main() {
   runApp(MyApp());
 }
@@ -42,7 +41,7 @@ class _ReelsState extends State<Reels> {
   ];
 
   bool selectedLike = true;
-  bool centreLike=false;
+  bool centreLike = false;
   Map<String, VideoPlayerController> _controllers = {};
   Map<int, VoidCallback> _listeners = {};
   bool _lock = true;
@@ -51,19 +50,16 @@ class _ReelsState extends State<Reels> {
   double _position = 0;
   double _buffer = 0;
 
-
-
-
-
   void _playController(int index) async {
-     if (!_listeners.keys.contains(index)) {
-       _listeners[index] = _listenerSpawner(index);
-     }
-     _controller(index)?.addListener(_listeners[index]!);
+    if (!_listeners.keys.contains(index)) {
+      _listeners[index] = _listenerSpawner(index);
+    }
+    _controller(index)?.addListener(_listeners[index]!);
     await _controller(index)!.play();
     _controller(index)!.setLooping(true);
     // setState(() {});
   }
+
   void _removeController(int index) {
     _controller(index)!.dispose();
     _controllers.remove(videos.elementAt(index));
@@ -73,7 +69,7 @@ class _ReelsState extends State<Reels> {
   void _stopController(int index) {
     _controller(index)!.removeListener(_listeners[index]!);
     _controller(index)!.pause();
-     _controller(index)!.seekTo(Duration(milliseconds: 0));
+    _controller(index)!.seekTo(Duration(milliseconds: 0));
   }
 
 //gaurav
@@ -82,10 +78,9 @@ class _ReelsState extends State<Reels> {
     if (_lock || indexx == 0) {
       return;
     }
-     //_lock = true;
+    //_lock = true;
 
-
-     _stopController(indexx);
+    _stopController(indexx);
 
     if (indexx + 1 < videos.length) {
       _removeController(indexx + 1);
@@ -107,7 +102,7 @@ class _ReelsState extends State<Reels> {
     }
     // _lock = true;
 
-     _stopController(indexx);
+    _stopController(indexx);
 
     if (indexx - 1 >= 0) {
       _removeController(indexx - 1);
@@ -116,7 +111,7 @@ class _ReelsState extends State<Reels> {
     _playController(++indexx);
 
     if (indexx == videos.length - 1) {
-       _lock = false;
+      _lock = false;
     } else {
       _initController(indexx + 1);
     }
@@ -150,7 +145,7 @@ class _ReelsState extends State<Reels> {
     await controller.initialize();
   }
 
-VoidCallback _listenerSpawner(index) {
+  VoidCallback _listenerSpawner(index) {
     return () {
       int dur = _controller(index)!.value.duration.inMilliseconds;
       int pos = _controller(index)!.value.position.inMilliseconds;
@@ -203,7 +198,6 @@ VoidCallback _listenerSpawner(index) {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: SafeArea(
         child: Container(
@@ -217,7 +211,7 @@ VoidCallback _listenerSpawner(index) {
                 loop: false,
                 index: indexx,
                 onIndexChanged: (i) {
-                  if (i > 0 ) {
+                  if (i >= 0) {
                     if (i < indexx) {
                       print("previous");
                       _previousVideo();
@@ -225,22 +219,15 @@ VoidCallback _listenerSpawner(index) {
                       print("next");
                       _nextVideo();
                     }
-                  } else if (i == 0) {
-                    if (videos.length > 0) {
-                      _initController(0).then((_) {
-                        _playController(0);
-                      });
-                    }
+                  } /* else if (i == 0) {
+                    _nextVideo();
 
-                    if (videos.length > 1) {
-                      _initController(1).whenComplete(() => _lock = false);
-                    }
-                  }else if(i==videos.length-1){
+                  } */ else if (i == videos.length - 1) {
                     print("previous");
                     _previousVideo();
                   }
                 },
-                itemHeight:  MediaQuery.of(context).size.height,
+                itemHeight: MediaQuery.of(context).size.height,
                 itemBuilder: (BuildContext context, int index) {
                   return Container(
                       height: MediaQuery.of(context).size.height,
@@ -250,20 +237,19 @@ VoidCallback _listenerSpawner(index) {
                           /*chewieController != null &&
                               chewieController!
                                   .videoPlayerController.value.isInitialized
-                              ?*/ GestureDetector(
+                              ?*/
+                          GestureDetector(
                               onDoubleTap: () {
                                 setState(() {
                                   centreLike = !centreLike;
                                 });
                               },
-
                               child: Container(
                                 height: MediaQuery.of(context).size.height,
-                                  color: Colors.red,
-                                  // child: Chewie(controller: chewieController!)
-                                child: VideoPlayer(_controller(index)!,),
-                              )
-                          ),
+                                color: Colors.red,
+                                // child: Chewie(controller: chewieController!)
+                                child: VideoPlayer(_controller(index)!),
+                              )),
                           //     : Column(
                           //   mainAxisAlignment: MainAxisAlignment.center,
                           //   children: [
@@ -279,7 +265,8 @@ VoidCallback _listenerSpawner(index) {
                               margin: EdgeInsets.symmetric(horizontal: 16),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Row(
                                     children: [
@@ -287,7 +274,8 @@ VoidCallback _listenerSpawner(index) {
                                         height: 48,
                                         width: 48,
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(24.0),
+                                          borderRadius:
+                                              BorderRadius.circular(24.0),
                                           color: Colors.blue,
                                         ),
                                       ),
@@ -315,15 +303,18 @@ VoidCallback _listenerSpawner(index) {
                                               color: Colors.white,
                                             ),
                                           ),
-
                                         ],
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                       ),
                                     ],
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.only(right: 30.0),
-                                    child: Icon(Icons.more_vert_rounded, color: Colors.white,),
+                                    child: Icon(
+                                      Icons.more_vert_rounded,
+                                      color: Colors.white,
+                                    ),
                                   )
                                 ],
                               ),
@@ -378,8 +369,11 @@ VoidCallback _listenerSpawner(index) {
               ),
               Padding(
                 padding:
-                const EdgeInsets.symmetric(vertical: 20.0, horizontal: 12),
-                child: Icon(Icons.arrow_back_rounded, color: Colors.white,),
+                    const EdgeInsets.symmetric(vertical: 20.0, horizontal: 12),
+                child: Icon(
+                  Icons.arrow_back_rounded,
+                  color: Colors.white,
+                ),
               )
             ],
           ),
