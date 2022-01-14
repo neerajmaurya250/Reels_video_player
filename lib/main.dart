@@ -67,6 +67,12 @@ class _ReelsState extends State<Reels> {
     _listeners.remove(index);
   }
 
+  void _stopController(int index) {
+    _controller(index)!.removeListener(_listeners[index]!);
+    _controller(index)!.dispose();
+    // _controller(index)!.seekTo(Duration(milliseconds: 0));
+  }
+
 
   void _previousVideo() {
     print('PREVIOUS');
@@ -75,7 +81,7 @@ class _ReelsState extends State<Reels> {
     }
     // _lock = true;
 
-    // _stopController(index);
+    // _stopController(indexx);
 
     if (indexx + 1 < videos.length) {
       _removeController(indexx + 1);
@@ -97,7 +103,7 @@ class _ReelsState extends State<Reels> {
     }
     // _lock = true;
 
-    // _stopController(index);
+    // _stopController(indexx);
 
     if (indexx - 1 >= 0) {
       _removeController(indexx - 1);
@@ -181,16 +187,29 @@ class _ReelsState extends State<Reels> {
                 itemCount: videos.length,
                 loop: false,
                 index: indexx,
-                onIndexChanged: (i){
+                onIndexChanged: (i) {
+                  if (i > 0 ) {
+                    if (i < indexx) {
+                      print("previous");
+                      _previousVideo();
+                    } else {
+                      print("next");
+                      _nextVideo();
+                    }
+                  } else if (i == 0) {
+                    if (videos.length > 0) {
+                      _initController(0).then((_) {
+                        _playController(0);
+                      });
+                    }
 
-                  if(i == current){
-                    current = i;
+                    if (videos.length > 1) {
+                      _initController(1).whenComplete(() => _lock = false);
+                    }
+                  }else if(i==videos.length-1){
+                    print("previous");
                     _previousVideo();
-                  }else{
-                    _nextVideo();
                   }
-
-                  current = i;
                 },
                 itemHeight:  MediaQuery.of(context).size.height,
                 itemBuilder: (BuildContext context, int index) {
