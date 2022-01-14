@@ -81,6 +81,7 @@ class _ReelsState extends State<Reels> {
     }
     // _lock = true;
 
+
     // _stopController(indexx);
 
     if (indexx + 1 < videos.length) {
