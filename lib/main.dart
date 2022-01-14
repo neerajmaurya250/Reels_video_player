@@ -1,8 +1,6 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
-import 'package:reels_video_player_example/content_screen.dart';
-import 'package:tiktoklikescroller/tiktoklikescroller.dart';
 import 'package:video_player/video_player.dart';
 
 void main() {
@@ -57,7 +55,6 @@ class _ReelsState extends State<Reels> {
     _controller(index)?.addListener(_listeners[index]!);
     await _controller(index)!.play();
     _controller(index)!.setLooping(true);
-    // setState(() {});
   }
 
   void _removeController(int index) {
@@ -72,22 +69,16 @@ class _ReelsState extends State<Reels> {
     _controller(index)!.seekTo(Duration(milliseconds: 0));
   }
 
-//gaurav
   void _previousVideo() {
     print('PREVIOUS');
     if (_lock || indexx == 0) {
       return;
     }
-    //_lock = true;
-
     _stopController(indexx);
-
     if (indexx + 1 < videos.length) {
       _removeController(indexx + 1);
     }
-
     _playController(--indexx);
-
     if (indexx == 0) {
       _lock = false;
     } else {
@@ -100,16 +91,11 @@ class _ReelsState extends State<Reels> {
     if (_lock || indexx == videos.length - 1) {
       return;
     }
-    // _lock = true;
-
     _stopController(indexx);
-
     if (indexx - 1 >= 0) {
       _removeController(indexx - 1);
     }
-
     _playController(++indexx);
-
     if (indexx == videos.length - 1) {
       _lock = false;
     } else {
@@ -129,22 +115,18 @@ class _ReelsState extends State<Reels> {
         _playController(0);
       });
     }
-
     if (videos.length > 1) {
       _initController(1).whenComplete(() => _lock = false);
     }
   }
-
   VideoPlayerController? _controller(int index) {
     return _controllers[videos.elementAt(index)];
   }
-
   Future<void> _initController(int index) async {
     var controller = VideoPlayerController.network(videos.elementAt(index));
     _controllers[videos.elementAt(index)] = controller;
     await controller.initialize();
   }
-
   VoidCallback _listenerSpawner(index) {
     return () {
       int dur = _controller(index)!.value.duration.inMilliseconds;
@@ -157,17 +139,10 @@ class _ReelsState extends State<Reels> {
           return;
         }
         _position = pos / dur;
-        print('Position');
         print(_position);
         _buffer = buf / dur;
-        print('Buffer');
         print(_buffer);
       });
-      // if (dur - pos < 1) {
-      //   if (index < _urls.length - 1) {
-      //     _nextVideo();
-      //   }
-      // }
     };
   }
   // Future initializePlayer(int index) async {
@@ -201,8 +176,6 @@ class _ReelsState extends State<Reels> {
     return Scaffold(
       body: SafeArea(
         child: Container(
-          // color: Colors.red,
-          //padding: const EdgeInsets.only(top: 50.0),
           child: Stack(
             children: [
               Swiper(
@@ -219,10 +192,7 @@ class _ReelsState extends State<Reels> {
                       print("next");
                       _nextVideo();
                     }
-                  } /* else if (i == 0) {
-                    _nextVideo();
-
-                  } */ else if (i == videos.length - 1) {
+                  }  else if (i == videos.length - 1) {
                     print("previous");
                     _previousVideo();
                   }
@@ -232,12 +202,7 @@ class _ReelsState extends State<Reels> {
                   return Container(
                       height: MediaQuery.of(context).size.height,
                       child: Stack(
-                        // fit: StackFit.expand,
                         children: [
-                          /*chewieController != null &&
-                              chewieController!
-                                  .videoPlayerController.value.isInitialized
-                              ?*/
                           GestureDetector(
                               onDoubleTap: () {
                                 setState(() {
@@ -250,14 +215,6 @@ class _ReelsState extends State<Reels> {
                                 // child: Chewie(controller: chewieController!)
                                 child: VideoPlayer(_controller(index)!),
                               )),
-                          //     : Column(
-                          //   mainAxisAlignment: MainAxisAlignment.center,
-                          //   children: [
-                          //     CircularProgressIndicator(),
-                          //     SizedBox(height: 10),
-                          //     Text('Loading...')
-                          //   ],
-                          // ),
                           Positioned(
                             bottom: 10,
                             child: Container(
@@ -587,203 +544,5 @@ class _HomeWidgetState extends State<HomeWidget> {
   void _handleCallbackEvent(ScrollEventType type, {int? currentIndex}) {
     print(
         "Scroll callback received with data: {type: $type, and index: ${currentIndex ?? 'not given'}}");
-  }
-}*/
-
-/*
-class VideoPlayerDemo extends StatefulWidget {
-  @override
-  _VideoPlayerDemoState createState() => _VideoPlayerDemoState();
-}
-
-class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
-  int index = 0;
-  double _position = 0;
-  double _buffer = 0;
-  bool _lock = true;
-  Map<String, VideoPlayerController> _controllers = {};
-  Map<int, VoidCallback> _listeners = {};
-  Set<String> _urls = {
-    'https://leverageedunew.s3.amazonaws.com/leverageapp/brand-advocates/Vedhant%20Rusty.mp4',
-    'https://leverageedunew.s3.amazonaws.com/leverageapp/brand-advocates/Sana%20Grover.mp4',
-    'https://leverageedunew.s3.amazonaws.com/leverageapp/brand-advocates/Nitish%20Rajpute.mp4',
-    'https://leverageedunew.s3.amazonaws.com/leverageapp/brand-advocates/Casslyn.mp4',
-    'https://leverageedunew.s3.amazonaws.com/leverageapp/brand-advocates/Avanti%20Nagrai.mp4',
-    'https://leverageedunew.s3.amazonaws.com/leverageapp/brand-advocates/Varun%20Sood.mp4'
-  };
-
-  @override
-  void initState() {
-    super.initState();
-
-    if (_urls.length > 0) {
-      _initController(0).then((_) {
-        _playController(0);
-      });
-    }
-
-    if (_urls.length > 1) {
-      _initController(1).whenComplete(() => _lock = false);
-    }
-  }
-
-  VoidCallback _listenerSpawner(index) {
-    return () {
-      int dur = _controller(index)!.value.duration.inMilliseconds;
-      int pos = _controller(index)!.value.position.inMilliseconds;
-      int buf = _controller(index)!.value.buffered.last.end.inMilliseconds;
-
-      setState(() {
-        if (dur <= pos) {
-          _position = 0;
-          return;
-        }
-        _position = pos / dur;
-        print('Position');
-        print(_position);
-        _buffer = buf / dur;
-        print('Buffer');
-        print(_buffer);
-      });
-      // if (dur - pos < 1) {
-      //   if (index < _urls.length - 1) {
-      //     _nextVideo();
-      //   }
-      // }
-    };
-  }
-
-  VideoPlayerController? _controller(int index) {
-    return _controllers[_urls.elementAt(index)];
-  }
-
-  Future<void> _initController(int index) async {
-    var controller = VideoPlayerController.network(_urls.elementAt(index));
-    _controllers[_urls.elementAt(index)] = controller;
-    await controller.initialize();
-  }
-
-  void _removeController(int index) {
-    _controller(index)!.dispose();
-    _controllers.remove(_urls.elementAt(index));
-    _listeners.remove(index);
-  }
-
-  void _stopController(int index) {
-    _controller(index)!.removeListener(_listeners[index]!);
-    _controller(index)!.pause();
-    _controller(index)!.seekTo(Duration(milliseconds: 0));
-  }
-
-  void _playController(int index) async {
-    if (!_listeners.keys.contains(index)) {
-      _listeners[index] = _listenerSpawner(index);
-    }
-    _controller(index)!.addListener(_listeners[index]!);
-    await _controller(index)!.play();
-    // setState(() {});
-  }
-
-
-
-  void _previousVideo() {
-    if (_lock || index == 0) {
-      return;
-    }
-    _lock = true;
-
-    _stopController(index);
-
-    if (index + 1 < _urls.length) {
-      _removeController(index + 1);
-    }
-
-    _playController(--index);
-
-    if (index == 0) {
-      _lock = false;
-    } else {
-      _initController(index - 1).whenComplete(() => _lock = false);
-    }
-  }
-
-  void _nextVideo() async {
-    if (_lock || index == _urls.length - 1) {
-      return;
-    }
-    // _lock = true;
-
-    _stopController(index);
-
-    // if (index - 1 >= 0) {
-    //   _removeController(index - 1);
-    // }
-
-    _playController(++index);
-
-    if (index == _urls.length - 1) {
-      _lock = false;
-    } else {
-      _initController(index + 1).whenComplete(() => _lock = false);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Playing ${index + 1} of ${_urls.length}"),
-        actions: [IconButton(onPressed: (){
-          showModalBottomSheet<void>(
-              context: context,
-              isScrollControlled: true,
-              backgroundColor: Colors.transparent,
-              enableDrag: true,
-              isDismissible: true,
-              useRootNavigator: true,
-              builder: (_) => Container(
-                  height: 50,
-                  color: Colors.white,
-                  child: TextField()
-              ));
-        }, icon: Icon(Icons.keyboard_arrow_up_rounded))],
-      ),
-      body: Stack(
-        children: <Widget>[
-          GestureDetector(
-            onLongPressStart: (_) => _controller(index)!.pause(),
-            onLongPressEnd: (_) => _controller(index)!.play(),
-            child: Center(
-              child: AspectRatio(
-                aspectRatio: _controller(index)!.value.aspectRatio,
-                child: Center(child: VideoPlayer(_controller(index)! )),
-              ),
-            ),
-          ),
-          Positioned(
-            child: Container(
-              height: 10,
-              width: MediaQuery.of(context).size.width * _buffer,
-              color: Colors.grey,
-            ),
-          ),
-          Positioned(
-            child: Container(
-              height: 10,
-              width: MediaQuery.of(context).size.width * _position,
-              color: Colors.greenAccent,
-            ),
-          ),
-        ],
-      ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: <Widget>[
-          FloatingActionButton(onPressed: _previousVideo, child: Icon(Icons.arrow_back)),
-          SizedBox(width: 24),
-          FloatingActionButton(onPressed: _nextVideo, child: Icon(Icons.arrow_forward)),
-        ],
-      ),
-    );
   }
 }*/
