@@ -200,24 +200,6 @@ void _stopController(int index) {
                     print("previous");
                       _previousVideo();
                   }
-
-                  /* if (indexx > 0) {
-                    if (i < indexx) {
-                      print("previous");
-                      _previousVideo();
-                    } else {
-                      print("next");
-                     
-                    }
-                  } */
-                  /*  if(i == current){
-                    current = i;
-                    
-                  }else{
-                    
-                  } */
-
-                  //  current = i;
                 },
                 // itemHeight:  MediaQuery.of(context).size.height,
                 itemBuilder: (BuildContext context, int index) {
