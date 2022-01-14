@@ -48,16 +48,18 @@ class _ReelsState extends State<Reels> {
   bool _lock = true;
   int indexx = 0;
   var current = 0;
+  double _position = 0;
+  double _buffer = 0;
 
 
 
 
 
   void _playController(int index) async {
-    // if (!_listeners.keys.contains(index)) {
-    //   _listeners[index] = _listenerSpawner(index);
-    // }
-    // _controller(0)?.addListener(_listeners[0]);
+     if (!_listeners.keys.contains(index)) {
+       _listeners[index] = _listenerSpawner(index);
+     }
+     _controller(index)?.addListener(_listeners[index]!);
     await _controller(index)!.play();
     // setState(() {});
   }
@@ -69,8 +71,8 @@ class _ReelsState extends State<Reels> {
 
   void _stopController(int index) {
     _controller(index)!.removeListener(_listeners[index]!);
-    _controller(index)!.dispose();
-    // _controller(index)!.seekTo(Duration(milliseconds: 0));
+    _controller(index)!.pause();
+     _controller(index)!.seekTo(Duration(milliseconds: 0));
   }
 
 //gaurav
@@ -79,10 +81,10 @@ class _ReelsState extends State<Reels> {
     if (_lock || indexx == 0) {
       return;
     }
-    // _lock = true;
+     //_lock = true;
 
 
-    // _stopController(indexx);
+     _stopController(indexx);
 
     if (indexx + 1 < videos.length) {
       _removeController(indexx + 1);
@@ -104,7 +106,7 @@ class _ReelsState extends State<Reels> {
     }
     // _lock = true;
 
-    // _stopController(indexx);
+     _stopController(indexx);
 
     if (indexx - 1 >= 0) {
       _removeController(indexx - 1);
@@ -113,7 +115,7 @@ class _ReelsState extends State<Reels> {
     _playController(++indexx);
 
     if (indexx == videos.length - 1) {
-      // _lock = false;
+       _lock = false;
     } else {
       _initController(indexx + 1);
     }
@@ -147,6 +149,31 @@ class _ReelsState extends State<Reels> {
     await controller.initialize();
   }
 
+VoidCallback _listenerSpawner(index) {
+    return () {
+      int dur = _controller(index)!.value.duration.inMilliseconds;
+      int pos = _controller(index)!.value.position.inMilliseconds;
+      int buf = _controller(index)!.value.buffered.last.end.inMilliseconds;
+
+      setState(() {
+        if (dur <= pos) {
+          _position = 0;
+          return;
+        }
+        _position = pos / dur;
+        print('Position');
+        print(_position);
+        _buffer = buf / dur;
+        print('Buffer');
+        print(_buffer);
+      });
+      // if (dur - pos < 1) {
+      //   if (index < _urls.length - 1) {
+      //     _nextVideo();
+      //   }
+      // }
+    };
+  }
   // Future initializePlayer(int index) async {
   //   videoPlayerController = VideoPlayerController.network(videos.elementAt(index));
   //   await Future.wait([videoPlayerController.initialize()]);
