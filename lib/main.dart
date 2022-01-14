@@ -73,7 +73,7 @@ class _ReelsState extends State<Reels> {
     // _controller(index)!.seekTo(Duration(milliseconds: 0));
   }
 
-
+//gaurav
   void _previousVideo() {
     print('PREVIOUS');
     if (_lock || indexx == 0) {
