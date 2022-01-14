@@ -1,8 +1,6 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
-import 'package:reels_video_player_example/content_screen.dart';
-import 'package:tiktoklikescroller/tiktoklikescroller.dart';
 import 'package:video_player/video_player.dart';
 
 void main() {
@@ -68,9 +66,9 @@ class _ReelsState extends State<Reels> {
     if (_lock || indexx == 0) {
       return;
     }
-    _lock = true;
+    //_lock = true;
 
-    // _stopController(index);
+    // _stopController(indexx);
 
     if (indexx + 1 < videos.length) {
       _removeController(indexx + 1);
@@ -92,7 +90,7 @@ class _ReelsState extends State<Reels> {
     }
     // _lock = true;
 
-    // _stopController(index);
+    // _stopController(indexx);
 
     if (indexx - 1 >= 0) {
       _removeController(indexx - 1);
@@ -125,6 +123,11 @@ class _ReelsState extends State<Reels> {
     }
   }
 
+void _stopController(int index) {
+    _controller(index)!.removeListener(_listeners[index]!);
+    _controller(index)!.pause();
+    _controller(index)!.seekTo(Duration(milliseconds: 0));
+  }
   VideoPlayerController? _controller(int index) {
     return _controllers[videos.elementAt(index)];
   }
@@ -173,6 +176,7 @@ class _ReelsState extends State<Reels> {
               Swiper(
                 scrollDirection: Axis.vertical,
                 itemCount: videos.length,
+                loop: false,
                 onIndexChanged: (i) {
                   if (i > 0 ) {
                     if (i < indexx) {
