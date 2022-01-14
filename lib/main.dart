@@ -1,7 +1,10 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
+import 'package:reels_video_player_example/content_screen.dart';
+import 'package:tiktoklikescroller/tiktoklikescroller.dart';
 import 'package:video_player/video_player.dart';
+
 
 void main() {
   runApp(MyApp());
@@ -39,12 +42,16 @@ class _ReelsState extends State<Reels> {
   ];
 
   bool selectedLike = true;
-  bool centreLike = false;
+  bool centreLike=false;
   Map<String, VideoPlayerController> _controllers = {};
   Map<int, VoidCallback> _listeners = {};
   bool _lock = true;
   int indexx = 0;
-  //var current = 0;
+  var current = 0;
+
+
+
+
 
   void _playController(int index) async {
     // if (!_listeners.keys.contains(index)) {
@@ -54,19 +61,25 @@ class _ReelsState extends State<Reels> {
     await _controller(index)!.play();
     // setState(() {});
   }
-
   void _removeController(int index) {
     _controller(index)!.dispose();
     _controllers.remove(videos.elementAt(index));
     _listeners.remove(index);
   }
 
+  void _stopController(int index) {
+    _controller(index)!.removeListener(_listeners[index]!);
+    _controller(index)!.dispose();
+    // _controller(index)!.seekTo(Duration(milliseconds: 0));
+  }
+
+
   void _previousVideo() {
     print('PREVIOUS');
     if (_lock || indexx == 0) {
       return;
     }
-    //_lock = true;
+    // _lock = true;
 
     // _stopController(indexx);
 
@@ -123,11 +136,6 @@ class _ReelsState extends State<Reels> {
     }
   }
 
-void _stopController(int index) {
-    _controller(index)!.removeListener(_listeners[index]!);
-    _controller(index)!.pause();
-    _controller(index)!.seekTo(Duration(milliseconds: 0));
-  }
   VideoPlayerController? _controller(int index) {
     return _controllers[videos.elementAt(index)];
   }
@@ -166,6 +174,7 @@ void _stopController(int index) {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       body: SafeArea(
         child: Container(
@@ -177,6 +186,7 @@ void _stopController(int index) {
                 scrollDirection: Axis.vertical,
                 itemCount: videos.length,
                 loop: false,
+                index: indexx,
                 onIndexChanged: (i) {
                   if (i > 0 ) {
                     if (i < indexx) {
@@ -198,10 +208,10 @@ void _stopController(int index) {
                     }
                   }else if(i==videos.length-1){
                     print("previous");
-                      _previousVideo();
+                    _previousVideo();
                   }
                 },
-                // itemHeight:  MediaQuery.of(context).size.height,
+                itemHeight:  MediaQuery.of(context).size.height,
                 itemBuilder: (BuildContext context, int index) {
                   return Container(
                       height: MediaQuery.of(context).size.height,
@@ -211,19 +221,20 @@ void _stopController(int index) {
                           /*chewieController != null &&
                               chewieController!
                                   .videoPlayerController.value.isInitialized
-                              ?*/
-                          GestureDetector(
+                              ?*/ GestureDetector(
                               onDoubleTap: () {
                                 setState(() {
                                   centreLike = !centreLike;
                                 });
                               },
+
                               child: Container(
                                 height: MediaQuery.of(context).size.height,
-                                color: Colors.red,
-                                // child: Chewie(controller: chewieController!)
-                                child: VideoPlayer(_controller(index)!),
-                              )),
+                                  color: Colors.red,
+                                  // child: Chewie(controller: chewieController!)
+                                child: VideoPlayer(_controller(index)! ),
+                              )
+                          ),
                           //     : Column(
                           //   mainAxisAlignment: MainAxisAlignment.center,
                           //   children: [
@@ -239,8 +250,7 @@ void _stopController(int index) {
                               margin: EdgeInsets.symmetric(horizontal: 16),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Row(
                                     children: [
@@ -248,8 +258,7 @@ void _stopController(int index) {
                                         height: 48,
                                         width: 48,
                                         decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(24.0),
+                                          borderRadius: BorderRadius.circular(24.0),
                                           color: Colors.blue,
                                         ),
                                       ),
@@ -277,18 +286,15 @@ void _stopController(int index) {
                                               color: Colors.white,
                                             ),
                                           ),
+
                                         ],
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                       ),
                                     ],
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.only(right: 30.0),
-                                    child: Icon(
-                                      Icons.more_vert_rounded,
-                                      color: Colors.white,
-                                    ),
+                                    child: Icon(Icons.more_vert_rounded, color: Colors.white,),
                                   )
                                 ],
                               ),
@@ -343,11 +349,8 @@ void _stopController(int index) {
               ),
               Padding(
                 padding:
-                    const EdgeInsets.symmetric(vertical: 20.0, horizontal: 12),
-                child: Icon(
-                  Icons.arrow_back_rounded,
-                  color: Colors.white,
-                ),
+                const EdgeInsets.symmetric(vertical: 20.0, horizontal: 12),
+                child: Icon(Icons.arrow_back_rounded, color: Colors.white,),
               )
             ],
           ),
